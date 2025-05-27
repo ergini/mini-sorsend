@@ -1,10 +1,23 @@
-import { createProject } from "@/app/actions";
+"use client";
 import type { FormProps } from "antd";
 import { Button, Form, Input, notification } from "antd";
-import { useState } from "react";
 import { TaskFormItems } from "./task-form-items";
-import type { CreateProjectData } from "@/app/actions";
-import { TaskProgress } from "@/app/generated/prisma";
+import { TaskProgress, Priority } from "@/app/generated/prisma";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+interface CreateTaskData {
+  title: string;
+  description?: string;
+  status: TaskProgress;
+  priority: Priority;
+  dueDate?: Date | null;
+}
+
+interface CreateProjectData {
+  name: string;
+  description?: string;
+  tasks?: CreateTaskData[];
+}
 
 interface AddProjectFormProps {
   onClose: () => void;
@@ -13,47 +26,56 @@ interface AddProjectFormProps {
 export const AddProjectForm = ({ onClose }: AddProjectFormProps) => {
   const [form] = Form.useForm<CreateProjectData>();
   const [api, contextHolder] = notification.useNotification();
-  const [submitting, setSubmitting] = useState(false);
+  const queryClient = useQueryClient();
 
-  const onFinish: FormProps<CreateProjectData>["onFinish"] = async (values) => {
-    try {
-      setSubmitting(true);
-      // Ensure all tasks have a status
-      const formattedValues = {
-        ...values,
-        tasks: values.tasks?.map((task) => ({
-          ...task,
-          status: task.status || TaskProgress.TODO,
-        })),
-      };
-
-      const result = await createProject(formattedValues);
-
-      if (result.error) {
-        api.error({
-          message: "Error",
-          description: result.error,
-        });
-      } else {
-        const taskCount = values.tasks?.length ?? 0;
-        api.success({
-          message: "Project Created",
-          description: `Project "${values.name}" has been created successfully with ${taskCount} tasks.`,
-        });
-        form.resetFields();
-        onClose();
+  const { mutate: createProject, isPending: isCreating } = useMutation({
+    mutationFn: async (data: CreateProjectData) => {
+      const response = await fetch("/api/projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to create project");
       }
-    } catch (error: unknown) {
+      
+      return response.json();
+    },
+    onSuccess: (newProject, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      
+      const taskCount = variables.tasks?.length ?? 0;
+      api.success({
+        message: "Project Created",
+        description: `Project "${variables.name}" has been created successfully with ${taskCount} tasks.`,
+        placement: "topRight",
+      });
+      form.resetFields();
+      onClose();
+    },
+    onError: (error) => {
+      console.error("Failed to create project:", error);
       api.error({
         message: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "An unexpected error occurred",
+        description: "Failed to create project. Please try again.",
+        placement: "topRight",
       });
-    } finally {
-      setSubmitting(false);
-    }
+    },
+  });
+
+  const onFinish: FormProps<CreateProjectData>["onFinish"] = (values) => {
+    const formattedValues = {
+      ...values,
+      tasks: values.tasks?.map((task) => ({
+        ...task,
+        status: task.status || TaskProgress.TODO,
+      })),
+    };
+
+    createProject(formattedValues);
   };
 
   const onFinishFailed: FormProps<CreateProjectData>["onFinishFailed"] = (
@@ -69,47 +91,58 @@ export const AddProjectForm = ({ onClose }: AddProjectFormProps) => {
         form={form}
         name="add-project"
         layout="vertical"
-        style={{ maxWidth: 800 }}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
         autoComplete="off"
         initialValues={{
           tasks: [],
         }}
+        className="space-y-4"
       >
         <Form.Item
-          label="Name"
+          label={<span className="text-sm font-medium text-foreground">Project Name</span>}
           name="name"
           rules={[
             { required: true, message: "Please input the project name!" },
           ]}
         >
-          <Input />
+          <Input 
+            placeholder="Enter project name"
+            className="h-10"
+          />
         </Form.Item>
 
-        <Form.Item label="Description" name="description">
-          <Input.TextArea rows={4} />
+        <Form.Item 
+          label={<span className="text-sm font-medium text-foreground">Description</span>}
+          name="description"
+        >
+          <Input.TextArea 
+            rows={3} 
+            placeholder="Enter project description (optional)"
+            className="resize-none"
+          />
         </Form.Item>
 
-        <Form.Item label="Tasks">
+        <Form.Item 
+          label={<span className="text-sm font-medium text-foreground">Tasks</span>}
+        >
           <TaskFormItems />
         </Form.Item>
 
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-end gap-3 pt-6 border-t border-border">
           <Button
-            variant="outlined"
             htmlType="button"
-            className="w-full"
             onClick={onClose}
-            disabled={submitting}
+            disabled={isCreating}
+            className="min-w-[100px]"
           >
             Cancel
           </Button>
           <Button
             type="primary"
             htmlType="submit"
-            className="w-full"
-            loading={submitting}
+            loading={isCreating}
+            className="min-w-[120px] shadow-sm"
           >
             Create Project
           </Button>

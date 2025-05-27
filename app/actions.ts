@@ -18,6 +18,12 @@ export interface CreateProjectData {
   tasks?: CreateTaskData[];
 }
 
+export interface UpdateProjectData {
+  name?: string;
+  description?: string | null;
+  icon?: string;
+}
+
 export async function createProject(data: CreateProjectData) {
   try {
     const project = await db.project.create({
@@ -50,6 +56,25 @@ export async function createProject(data: CreateProjectData) {
   }
 }
 
+export async function updateProject(
+  projectId: string,
+  data: UpdateProjectData
+) {
+  try {
+    const project = await db.project.update({
+      where: { id: projectId },
+      data,
+      include: { tasks: true },
+    });
+
+    revalidatePath("/");
+    return { data: project };
+  } catch (error) {
+    console.error("Failed to update project:", error);
+    return { error: "Failed to update project" };
+  }
+}
+
 export interface UpdateTaskData {
   title?: string;
   description?: string | null;
@@ -66,7 +91,6 @@ export async function updateTask(taskId: string, data: UpdateTaskData) {
       include: { project: true },
     });
 
-    revalidatePath("/");
     return { data: task };
   } catch (error) {
     console.error("Failed to update task:", error);
