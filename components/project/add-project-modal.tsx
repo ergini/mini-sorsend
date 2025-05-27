@@ -1,9 +1,8 @@
 "use client";
-import { Button, Modal } from "antd";
+import { useRoleStore } from "@/store/useRole";
+import { Button, Modal, Skeleton } from "antd";
 import { useState } from "react";
 import { AddProjectForm } from "./add-project-form";
-import { useRoleStore } from "@/store/useRole";
-import { Skeleton } from "antd";
 
 export default function AddProject() {
   const { role, hydrated } = useRoleStore();

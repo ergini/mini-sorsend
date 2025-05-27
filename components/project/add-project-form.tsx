@@ -1,9 +1,9 @@
 "use client";
+import { Priority, TaskProgress } from "@/app/generated/prisma";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { FormProps } from "antd";
 import { Button, Form, Input, notification } from "antd";
 import { TaskFormItems } from "./task-form-items";
-import { TaskProgress, Priority } from "@/app/generated/prisma";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface CreateTaskData {
   title: string;
@@ -37,16 +37,16 @@ export const AddProjectForm = ({ onClose }: AddProjectFormProps) => {
         },
         body: JSON.stringify(data),
       });
-      
+
       if (!response.ok) {
         throw new Error("Failed to create project");
       }
-      
+
       return response.json();
     },
     onSuccess: (newProject, variables) => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
-      
+
       const taskCount = variables.tasks?.length ?? 0;
       api.success({
         message: "Project Created",
@@ -100,31 +100,38 @@ export const AddProjectForm = ({ onClose }: AddProjectFormProps) => {
         className="space-y-4"
       >
         <Form.Item
-          label={<span className="text-sm font-medium text-foreground">Project Name</span>}
+          label={
+            <span className="text-sm font-medium text-foreground">
+              Project Name
+            </span>
+          }
           name="name"
           rules={[
             { required: true, message: "Please input the project name!" },
           ]}
         >
-          <Input 
-            placeholder="Enter project name"
-            className="h-10"
-          />
+          <Input placeholder="Enter project name" className="h-10" />
         </Form.Item>
 
-        <Form.Item 
-          label={<span className="text-sm font-medium text-foreground">Description</span>}
+        <Form.Item
+          label={
+            <span className="text-sm font-medium text-foreground">
+              Description
+            </span>
+          }
           name="description"
         >
-          <Input.TextArea 
-            rows={3} 
+          <Input.TextArea
+            rows={3}
             placeholder="Enter project description (optional)"
             className="resize-none"
           />
         </Form.Item>
 
-        <Form.Item 
-          label={<span className="text-sm font-medium text-foreground">Tasks</span>}
+        <Form.Item
+          label={
+            <span className="text-sm font-medium text-foreground">Tasks</span>
+          }
         >
           <TaskFormItems />
         </Form.Item>

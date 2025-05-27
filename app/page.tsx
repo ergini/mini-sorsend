@@ -2,19 +2,21 @@ import AddProject from "@/components/project/add-project-modal";
 import Projects from "@/components/project/projects";
 import RoleToggle from "@/components/role-toggle";
 import { Suspense } from "react";
+import { SocketStatus } from "@/components/socket-status";
 
 export default async function Home() {
   return (
-    <main className="min-h-screen bg-background">
-      <div className="w-full p-6 space-y-8 max-w-7xl mx-auto">
-        <header className="flex items-center justify-between">
+    <div className="min-h-screen">
+      <SocketStatus />
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="font-semibold text-3xl text-foreground">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
               Mini Sorsend
             </h1>
           </div>
           <RoleToggle />
-        </header>
+        </div>
 
         <section className="w-full space-y-6">
           <div className="w-full flex items-center justify-between">
@@ -40,6 +42,6 @@ export default async function Home() {
           </Suspense>
         </section>
       </div>
-    </main>
+    </div>
   );
 }

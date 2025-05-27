@@ -6,6 +6,7 @@ import {
   CalendarOutlined,
   CloseOutlined,
   CrownOutlined,
+  DeleteOutlined,
   EditOutlined,
   FileTextOutlined,
   FolderOutlined,
@@ -78,6 +79,7 @@ export const ProjectItem = ({ project }: ProjectItemProps) => {
   const isManager = role === "manager";
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditingProject, setIsEditingProject] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editedProject, setEditedProject] = useState({
     name: project.name,
     description: project.description || "",
@@ -103,6 +105,7 @@ export const ProjectItem = ({ project }: ProjectItemProps) => {
       return response.json();
     },
     onSuccess: () => {
+      // Manual cache invalidation as fallback
       queryClient.invalidateQueries({ queryKey: ["projects"] });
 
       setIsEditingProject(false);
@@ -117,6 +120,40 @@ export const ProjectItem = ({ project }: ProjectItemProps) => {
       api.error({
         message: "Save Failed",
         description: "Could not save project changes",
+        placement: "topRight",
+      });
+    },
+  });
+
+  const { mutate: deleteProject, isPending: isDeletingProject } = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/projects/${project.id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete project");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      // Manual cache invalidation as fallback
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+
+      setIsDeleteModalOpen(false);
+      setIsModalOpen(false);
+      api.success({
+        message: "Project Deleted",
+        description: "Project has been deleted successfully",
+        placement: "topRight",
+      });
+    },
+    onError: (error) => {
+      console.error("Failed to delete project:", error);
+      api.error({
+        message: "Delete Failed",
+        description: "Could not delete project",
         placement: "topRight",
       });
     },
@@ -433,13 +470,23 @@ export const ProjectItem = ({ project }: ProjectItemProps) => {
                     </Button>
                   </>
                 ) : (
-                  <Button
-                    size="small"
-                    onClick={() => setIsEditingProject(true)}
-                    icon={<EditOutlined />}
-                  >
-                    Edit Project
-                  </Button>
+                  <>
+                    <Button
+                      size="small"
+                      danger
+                      onClick={() => setIsDeleteModalOpen(true)}
+                      icon={<DeleteOutlined />}
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      size="small"
+                      onClick={() => setIsEditingProject(true)}
+                      icon={<EditOutlined />}
+                    >
+                      Edit Project
+                    </Button>
+                  </>
                 )}
               </Space>
             )}
@@ -460,6 +507,42 @@ export const ProjectItem = ({ project }: ProjectItemProps) => {
       >
         <div className="px-6">
           <Tabs items={tabItems} />
+        </div>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        title="Delete Project"
+        open={isDeleteModalOpen}
+        onCancel={() => setIsDeleteModalOpen(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setIsDeleteModalOpen(false)}>
+            Cancel
+          </Button>,
+          <Button
+            key="delete"
+            type="primary"
+            danger
+            loading={isDeletingProject}
+            onClick={() => deleteProject()}
+          >
+            Delete Project
+          </Button>,
+        ]}
+        width={400}
+      >
+        <div className="py-4">
+          <p className="text-gray-700 mb-4">
+            Are you sure you want to delete the project "{project.name}"?
+          </p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+            <p className="text-red-700 text-sm font-medium mb-1">
+              ⚠️ This action cannot be undone
+            </p>
+            <p className="text-red-600 text-sm">
+              All tasks associated with this project will also be deleted.
+            </p>
+          </div>
         </div>
       </Modal>
     </>

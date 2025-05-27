@@ -7,7 +7,6 @@ import { ProjectItem } from "./project-item";
 const ProjectSkeleton = () => (
   <Card className="h-full">
     <div className="space-y-4">
-      {/* Header skeleton */}
       <div className="flex items-center gap-3">
         <Skeleton.Avatar size="large" />
         <div className="flex-1">
@@ -15,10 +14,8 @@ const ProjectSkeleton = () => (
         </div>
       </div>
 
-      {/* Description skeleton */}
       <Skeleton paragraph={{ rows: 2, width: ["100%", "80%"] }} active />
 
-      {/* Stats skeleton */}
       <div className="grid grid-cols-3 gap-3">
         {[1, 2, 3].map((i) => (
           <div key={i} className="p-3 bg-gray-50 rounded-lg">
@@ -30,7 +27,6 @@ const ProjectSkeleton = () => (
         ))}
       </div>
 
-      {/* Recent task skeleton */}
       <div className="mt-4">
         <Skeleton.Input style={{ width: 100, height: 16 }} active />
         <div className="mt-2 p-3 bg-gray-50 rounded-lg">

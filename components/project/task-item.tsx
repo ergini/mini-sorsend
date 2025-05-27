@@ -10,6 +10,7 @@ import {
   PlayCircleOutlined,
   SaveOutlined,
 } from "@ant-design/icons";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Button,
   DatePicker,
@@ -24,7 +25,6 @@ import {
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 dayjs.extend(relativeTime);
 
@@ -84,33 +84,39 @@ export const TaskItem = ({
         },
         body: JSON.stringify(data),
       });
-      
+
       if (!response.ok) {
         throw new Error("Failed to update task");
       }
-      
+
       return response.json();
     },
     onSuccess: (updatedTask, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      
+      queryClient.invalidateQueries({ queryKey: ["projects"], type: "all" });
+
       if (variables.status) {
         api.success({
           message: "Task Updated",
-          description: `Status changed to ${StatusConfig[variables.status].label}`,
+          description: `Status changed to ${
+            StatusConfig[variables.status].label
+          }`,
           placement: "topRight",
         });
       } else if (variables.priority) {
         api.success({
           message: "Priority Updated",
-          description: `Priority set to ${PriorityConfig[variables.priority].label}`,
+          description: `Priority set to ${
+            PriorityConfig[variables.priority].label
+          }`,
           placement: "topRight",
         });
       } else if (variables.dueDate !== undefined) {
         api.success({
           message: "Due Date Updated",
           description: variables.dueDate
-            ? `Due date set to ${dayjs(variables.dueDate).format("MMM DD, YYYY")}`
+            ? `Due date set to ${dayjs(variables.dueDate).format(
+                "MMM DD, YYYY"
+              )}`
             : "Due date removed",
           placement: "topRight",
         });
@@ -125,7 +131,7 @@ export const TaskItem = ({
     },
     onError: (error, variables) => {
       console.error("Failed to update task:", error);
-      
+
       let description = "Could not update task";
       if (variables.status) {
         description = "Could not update task status";
@@ -136,7 +142,7 @@ export const TaskItem = ({
       } else if (variables.title || variables.description !== undefined) {
         description = "Could not save task changes";
       }
-      
+
       api.error({
         message: "Update Failed",
         description,

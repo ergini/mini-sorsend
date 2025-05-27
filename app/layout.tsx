@@ -5,6 +5,7 @@ import { ConfigProvider } from "antd";
 import "@ant-design/v5-patch-for-react-19";
 import "./globals.css";
 import { ReactQueryClientProvider } from "@/providers/react-query-provider";
+import { SocketProvider } from "@/providers/socket-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,7 +35,9 @@ export default function RootLayout({
           suppressHydrationWarning
         >
           <AntdRegistry>
-            <ConfigProvider>{children}</ConfigProvider>
+            <ConfigProvider>
+              <SocketProvider>{children}</SocketProvider>
+            </ConfigProvider>
           </AntdRegistry>
         </body>
       </html>
