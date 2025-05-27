@@ -1,6 +1,6 @@
 "use server";
 
-import { TaskProgress } from "@/app/generated/prisma";
+import { TaskProgress, Priority } from "@/app/generated/prisma";
 import db from "@/utils/db";
 import { revalidatePath } from "next/cache";
 
@@ -8,6 +8,8 @@ export interface CreateTaskData {
   title: string;
   description?: string;
   status: TaskProgress;
+  priority: Priority;
+  dueDate?: Date | null;
 }
 
 export interface CreateProjectData {
@@ -29,6 +31,8 @@ export async function createProject(data: CreateProjectData) {
                   title: task.title,
                   description: task.description,
                   status: task.status,
+                  priority: task.priority,
+                  dueDate: task.dueDate,
                 })),
               }
             : undefined,
@@ -46,11 +50,19 @@ export async function createProject(data: CreateProjectData) {
   }
 }
 
-export async function updateTaskStatus(taskId: string, status: TaskProgress) {
+export interface UpdateTaskData {
+  title?: string;
+  description?: string | null;
+  status?: TaskProgress;
+  priority?: Priority;
+  dueDate?: Date | null;
+}
+
+export async function updateTask(taskId: string, data: UpdateTaskData) {
   try {
     const task = await db.task.update({
       where: { id: taskId },
-      data: { status },
+      data,
       include: { project: true },
     });
 
@@ -58,6 +70,11 @@ export async function updateTaskStatus(taskId: string, status: TaskProgress) {
     return { data: task };
   } catch (error) {
     console.error("Failed to update task:", error);
-    return { error: "Failed to update task status" };
+    return { error: "Failed to update task" };
   }
+}
+
+// Keep for backward compatibility
+export async function updateTaskStatus(taskId: string, status: TaskProgress) {
+  return updateTask(taskId, { status });
 }
