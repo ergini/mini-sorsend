@@ -32,6 +32,7 @@ import {
 import dayjs from "dayjs";
 import { useState } from "react";
 import { TaskItem } from "./task-item";
+import { AddTaskForm } from "./add-task-form";
 
 interface ProjectItemProps {
   project: Project & { tasks: Task[] };
@@ -80,6 +81,7 @@ export const ProjectItem = ({ project }: ProjectItemProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditingProject, setIsEditingProject] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
   const [editedProject, setEditedProject] = useState({
     name: project.name,
     description: project.description || "",
@@ -318,21 +320,37 @@ export const ProjectItem = ({ project }: ProjectItemProps) => {
         hoverable
       >
         <div className="mb-6">
-          <div className="flex items-start gap-4 mb-4">
-            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl flex items-center justify-center text-blue-600 text-xl group-hover:scale-105 transition-transform duration-200">
-              {getIconComponent(project.icon || "FolderOutlined")}
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 leading-tight">
-                {project.name}
-              </h3>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <CalendarOutlined className="text-xs" />
-                <span>
-                  Created {dayjs(project.createdAt).format("MMM DD, YYYY")}
-                </span>
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="flex items-start gap-4 flex-1">
+              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl flex items-center justify-center text-blue-600 text-xl group-hover:scale-105 transition-transform duration-200">
+                {getIconComponent(project.icon || "FolderOutlined")}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 leading-tight">
+                  {project.name}
+                </h3>
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <CalendarOutlined className="text-xs" />
+                  <span>
+                    Created {dayjs(project.createdAt).format("MMM DD, YYYY")}
+                  </span>
+                </div>
               </div>
             </div>
+            
+            {/* Add Task Button - always visible in header */}
+            {isManager && (
+              <Button
+                type="primary"
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsAddTaskModalOpen(true);
+                }}
+              >
+                Add Task
+              </Button>
+            )}
           </div>
 
           {project.description ? (
@@ -545,6 +563,14 @@ export const ProjectItem = ({ project }: ProjectItemProps) => {
           </div>
         </div>
       </Modal>
+
+      {/* Add Task Form Modal */}
+      <AddTaskForm
+        projectId={project.id}
+        projectName={project.name}
+        isOpen={isAddTaskModalOpen}
+        onClose={() => setIsAddTaskModalOpen(false)}
+      />
     </>
   );
 };
