@@ -1,10 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { Task } from "@/app/generated/prisma";
 import db from "@/utils/db";
-import { Server as ServerIO } from "socket.io";
-
-declare global {
-  var io: ServerIO | undefined;
-}
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   const projects = await db.project.findMany({
@@ -28,7 +24,7 @@ export async function POST(request: NextRequest) {
         tasks:
           tasks && tasks.length > 0
             ? {
-                create: tasks.map((task: any) => ({
+                create: tasks.map((task: Task) => ({
                   title: task.title,
                   description: task.description || null,
                   status: task.status,
@@ -47,7 +43,10 @@ export async function POST(request: NextRequest) {
 
     // Emit Socket.IO event for real-time updates
     if (global.io) {
-      console.log("Socket.IO available, connected clients:", global.io.engine.clientsCount);
+      console.log(
+        "Socket.IO available, connected clients:",
+        global.io.engine.clientsCount
+      );
       console.log("Emitting project-updated event for project:", project.id);
       global.io.emit("project-updated", project);
       console.log("Event emitted successfully");

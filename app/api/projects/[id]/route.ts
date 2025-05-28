@@ -1,10 +1,5 @@
 import db from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
-import { Server as ServerIO } from "socket.io";
-
-declare global {
-  var io: ServerIO | undefined;
-}
 
 export async function PATCH(
   request: NextRequest,
@@ -48,7 +43,7 @@ export async function DELETE(
 ) {
   const { id } = await params;
   try {
-    const project = await db.project.delete({
+    await db.project.delete({
       where: { id },
       include: { tasks: true },
     });

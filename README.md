@@ -1,14 +1,14 @@
 # Mini Sorsend - Task Management System
 Sask management app with Next.js, Socket.IO, Prisma, and PostgreSQL.
 
-## Getting Started
+## Setup
 
-## DB Setup
+### DB Setup
 1. Go to pgAdmin
 2. Create a new database named <code>mini-sorsend-db</code>
 3. Open code and edit `.env` file, add your database url in this format: `DATABASE_URL=postgresql://username:password@host:port/mini-sorsend-db`
 
-## App Start
+### App Start
 1. Run this script:
 ```bash
 npm run dev
@@ -19,12 +19,13 @@ npm run dev
 
 ### 1. Nëse ky modul do të përdorej nga 10,000+ përdorues, çfarë do ndryshoje?
 
-- 
+- **Backups**: Ne kete rast kemi te dhena te shumta dhe sa me shume te dhena aq me shume pergjegjesi. Per te mos shkaktuar konfuzim ne rast se databaza jone per qfaredo arsye mund te mos jete funksionale ne nje interval te caktuar kohore, na duhet te kemi backups te asaj databaze. Sugjerimi im do te ishte i thjeshte, te jete nje `replica` i databazes kryesore, e cila nuk behet fetch perveq ne raste te veqanta apo per shkaqe testimi
+- **Dizajni**: Edhe pse me rendesi eshte qe aplikacioni te funksionoj ne rregull, ne nje volum prej 10k perdorues gjasat qe te kemi kerkesa per ndryshime ne UI jane te medha. Andaj do te shqyrtoja kerkesat dhe do te shikoja nese ajo qe po kerkohet eshte me te vertete e nevojshme, nje UI/UX i mire i mbane perdoruesit te angazhuar sa me shume me app-in tone.
 
 ### 2. Çfarë rreziqesh ose edge-case mund të ndodhin?
 
-- 
+- Ne rast se nuk kemi autentikim te menyrave te ndryshme ne te dyja ambientet Client Side dhe Server Side, atehere me kerkesa nga jashte ne API-t tona mund te krijohen, perditesohen apo edhe fshihen projekte.
 
 ### 3. Si do e parandalosh dublimin e task-eve në një sistem webhook?
 
-- 
+- Ne momentin qe pranojme nje webhook atehere do te kontrolloja per nje field e cila e ben te dalluar nje task i cili eshte krijuar nga webhook, nese ekziston nje e tille atehere webhook vazhdon tutje dhe nuk krijon taske te re.

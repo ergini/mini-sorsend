@@ -1,7 +1,7 @@
-const { createServer } = require("http");
-const { parse } = require("url");
-const next = require("next");
-const { Server } = require("socket.io");
+import { createServer } from "http";
+import next from "next";
+import { Server } from "socket.io";
+import { parse } from "url";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -51,4 +51,4 @@ app.prepare().then(() => {
     .listen(port, () => {
       console.log(`> Ready on http://${hostname}:${port}`);
     });
-}); 
+});

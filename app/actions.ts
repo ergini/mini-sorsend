@@ -1,6 +1,6 @@
 "use server";
 
-import { TaskProgress, Priority } from "@/app/generated/prisma";
+import { Priority, TaskProgress } from "@/app/generated/prisma";
 import db from "@/utils/db";
 import { revalidatePath } from "next/cache";
 

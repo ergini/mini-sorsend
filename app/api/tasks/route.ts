@@ -1,10 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
-import { Server as ServerIO } from "socket.io";
-
-declare global {
-  var io: ServerIO | undefined;
-}
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,4 +33,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

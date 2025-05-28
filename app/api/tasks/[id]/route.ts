@@ -1,10 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
-import { Server as ServerIO } from "socket.io";
-
-declare global {
-  var io: ServerIO | undefined;
-}
+import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
   request: NextRequest,
@@ -22,7 +17,9 @@ export async function PATCH(
         ...(description !== undefined && { description }),
         ...(status !== undefined && { status }),
         ...(priority !== undefined && { priority }),
-        ...(dueDate !== undefined && { dueDate: dueDate ? new Date(dueDate) : null }),
+        ...(dueDate !== undefined && {
+          dueDate: dueDate ? new Date(dueDate) : null,
+        }),
       },
       include: { project: { include: { tasks: true } } },
     });
