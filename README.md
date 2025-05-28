@@ -14,6 +14,10 @@ Sask management app with Next.js, Socket.IO, Prisma, and PostgreSQL.
 1. Go to pgAdmin
 2. Create a new database named <code>mini-sorsend-db</code>
 3. Open code and edit `.env` file, add your database url in this format: `DATABASE_URL=postgresql://username:password@host:port/mini-sorsend-db`
+4. Run this script:
+```bash
+npx prisma db push
+```
 
 ### Dependecies installation
 1. Run this script:
