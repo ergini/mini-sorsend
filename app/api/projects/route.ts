@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   const projects = await db.project.findMany({
-    include: { tasks: true },
+    include: { tasks: { orderBy: { createdAt: "desc" } } },
   });
 
   return NextResponse.json(projects);
