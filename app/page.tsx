@@ -1,7 +1,6 @@
 import AddProject from "@/components/project/add-project-modal";
 import Projects from "@/components/project/projects";
 import RoleToggle from "@/components/role-toggle";
-import { Suspense } from "react";
 import { SocketStatus } from "@/components/socket-status";
 
 export default async function Home() {
@@ -28,18 +27,7 @@ export default async function Home() {
             </div>
             <AddProject />
           </div>
-
-          <Suspense
-            fallback={
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-pulse text-muted-foreground">
-                  Loading projects...
-                </div>
-              </div>
-            }
-          >
-            <Projects />
-          </Suspense>
+          <Projects />
         </section>
       </div>
     </div>
