@@ -1,6 +1,13 @@
 # Mini Sorsend - Task Management System
 Sask management app with Next.js, Socket.IO, Prisma, and PostgreSQL.
 
+## Teknologjite
+- Next.js with Ant Design
+- Prisma with Postgre
+- Zustand for state management - Used this for keeping the role persistent
+- Tanstack React Query - I'm doing data fetching on client side, the best one out there with built-in caching
+- SocketIO for realtime updates - I've used this on every possible change
+
 ## Setup
 
 ### DB Setup
